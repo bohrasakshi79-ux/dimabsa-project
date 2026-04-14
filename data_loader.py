@@ -1,9 +1,9 @@
 import json
 
-def load_data("dataset/eng_restaurant_trial_alltasks.jsonl"):
+def load_data(file_path):
     data = []
     
-    with open("dataset/eng_restaurant_trial_alltasks.jsonl", 'r', encoding='utf-8') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         for line in f:
             data.append(json.loads(line))
     
