@@ -1,10 +1,11 @@
 import streamlit as st
 from transformers import pipeline
+import re
 
 # Page settings
 st.set_page_config(page_title="Sentiment Analyzer", page_icon="💬", layout="centered")
 
-# Custom CSS for styling
+# Custom CSS
 st.markdown("""
     <style>
     .main {
@@ -35,11 +36,8 @@ st.markdown("""
 st.markdown('<div class="title">💬 Aspect-Based Sentiment Analyzer</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Analyze sentiment for specific aspects in a sentence</div>', unsafe_allow_html=True)
 
-st.write("")
-
-# Input section
-sentence = st.text_area("📝 Enter Sentence", placeholder="Example: The food is great but service is slow")
-
+# Input
+sentence = st.text_area("📝 Enter Sentence", placeholder="Example: The food is great but service is bad")
 aspects = st.text_input("🔍 Enter Aspects (comma separated)", placeholder="food, service")
 
 # Load model
@@ -49,9 +47,10 @@ classifier = pipeline("sentiment-analysis")
 if st.button("Analyze Sentiment"):
 
     if sentence and aspects:
+
         aspect_list = aspects.split(",")
 
-        # Overall sentiment
+        # 🔹 Overall sentiment
         overall = classifier(sentence)[0]
 
         st.markdown("### 📊 Overall Sentiment")
@@ -60,17 +59,28 @@ if st.button("Analyze Sentiment"):
         else:
             st.error(f" {overall['label']}")
 
-        # Aspect-wise
+        # 🔹 Improved aspect logic (handles "but")
         st.markdown("### 🔎 Aspect-wise Sentiment")
+
+        parts = re.split(r'\bbut\b', sentence.lower())
 
         for aspect in aspect_list:
             aspect = aspect.strip()
-            result = classifier(f"{aspect} {sentence}")[0]
+            found = False
+
+            for part in parts:
+                if aspect in part:
+                    result = classifier(part)[0]
+                    found = True
+                    break
+
+            if not found:
+                result = classifier(sentence)[0]
 
             if result["label"] == "POSITIVE":
-                st.markdown(f'<div class="result-box">✅ <b>{aspect}</b> →  Positive</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box">✅ <b>{aspect}</b> → Positive</div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="result-box">❌ <b>{aspect}</b> →  Negative</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box">❌ <b>{aspect}</b> → Negative</div>', unsafe_allow_html=True)
 
     else:
         st.warning("⚠️ Please enter both sentence and aspects")
