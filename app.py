@@ -46,7 +46,7 @@ aspects = st.text_input("🔍 Enter Aspects (comma separated)", placeholder="foo
 classifier = pipeline("sentiment-analysis")
 
 # Button
-if st.button("🚀 Analyze Sentiment"):
+if st.button("Analyze Sentiment"):
 
     if sentence and aspects:
         aspect_list = aspects.split(",")
@@ -56,9 +56,9 @@ if st.button("🚀 Analyze Sentiment"):
 
         st.markdown("### 📊 Overall Sentiment")
         if overall["label"] == "POSITIVE":
-            st.success(f"😊 {overall['label']}")
+            st.success(f" {overall['label']}")
         else:
-            st.error(f"😞 {overall['label']}")
+            st.error(f" {overall['label']}")
 
         # Aspect-wise
         st.markdown("### 🔎 Aspect-wise Sentiment")
@@ -68,9 +68,9 @@ if st.button("🚀 Analyze Sentiment"):
             result = classifier(f"{aspect} {sentence}")[0]
 
             if result["label"] == "POSITIVE":
-                st.markdown(f'<div class="result-box">✅ <b>{aspect}</b> → 😊 Positive</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box">✅ <b>{aspect}</b> →  Positive</div>', unsafe_allow_html=True)
             else:
-                st.markdown(f'<div class="result-box">❌ <b>{aspect}</b> → 😞 Negative</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="result-box">❌ <b>{aspect}</b> →  Negative</div>', unsafe_allow_html=True)
 
     else:
         st.warning("⚠️ Please enter both sentence and aspects")
