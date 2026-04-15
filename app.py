@@ -1,33 +1,23 @@
-from flask import Flask, render_template, request
+import streamlit as st
 from transformers import pipeline
 
-app = Flask(__name__)
+st.title("Aspect-Based Sentiment Analyzer")
 
 classifier = pipeline("sentiment-analysis")
 
-@app.route("/", methods=["GET", "POST"])
-def home():
-    result = []
-    overall_sentiment = ""
+sentence = st.text_area("Enter sentence:")
+aspects = st.text_input("Enter aspects (comma separated):")
 
-    if request.method == "POST":
-        sentence = request.form["sentence"]
-        aspects = request.form["aspects"].split(",")
+if st.button("Analyze"):
+    if sentence and aspects:
+        aspect_list = aspects.split(",")
 
-        # Overall sentiment
+        st.subheader("Overall Sentiment")
         overall = classifier(sentence)[0]
-        overall_sentiment = overall["label"]
+        st.write(overall["label"])
 
-        # Aspect-wise sentiment
-        for aspect in aspects:
+        st.subheader("Aspect-wise Sentiment")
+        for aspect in aspect_list:
             aspect = aspect.strip()
-            aspect_result = classifier(f"{aspect} {sentence}")[0]
-            result.append({
-                "aspect": aspect,
-                "sentiment": aspect_result["label"]
-            })
-
-    return render_template("index.html", result=result, overall=overall_sentiment)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+            result = classifier(f"{aspect} {sentence}")[0]
+            st.write(f"{aspect} → {result['label']}")
