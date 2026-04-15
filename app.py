@@ -1,26 +1,33 @@
-import streamlit as st
-from model import predict_va
-from data_loader import load_data
+from flask import Flask, render_template, request
+from transformers import pipeline
 
-st.title("DimABSA Sentiment Analyzer")
+app = Flask(__name__)
 
-# Load dataset
-data = load_data("dataset/eng_restaurant_trial_alltasks.jsonl")
+classifier = pipeline("sentiment-analysis")
 
-st.subheader("Sample Dataset Example:")
-st.write(data[0])
+@app.route("/", methods=["GET", "POST"])
+def home():
+    result = []
+    overall_sentiment = ""
 
-# Input
-text = st.text_input("Enter sentence:")
-aspect_input = st.text_input("Enter aspects (comma separated):")
+    if request.method == "POST":
+        sentence = request.form["sentence"]
+        aspects = request.form["aspects"].split(",")
 
-if st.button("Analyze"):
-    if text and aspect_input:
-        aspects = aspect_input.split(",")
+        # Overall sentiment
+        overall = classifier(sentence)[0]
+        overall_sentiment = overall["label"]
 
-        st.subheader("Results:")
+        # Aspect-wise sentiment
+        for aspect in aspects:
+            aspect = aspect.strip()
+            aspect_result = classifier(f"{aspect} {sentence}")[0]
+            result.append({
+                "aspect": aspect,
+                "sentiment": aspect_result["label"]
+            })
 
-        for asp in aspects:
-            asp = asp.strip()
-            v, a = predict_va(text, asp)
-            st.write(f"{asp} → {v}#{a}")
+    return render_template("index.html", result=result, overall=overall_sentiment)
+
+if __name__ == "__main__":
+    app.run(debug=True)

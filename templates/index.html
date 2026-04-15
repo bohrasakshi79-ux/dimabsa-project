@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aspect-Based Sentiment Analyzer</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f6f9;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            margin: 50px auto;
+            width: 50%;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+        }
+        input, textarea {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Aspect-Based Sentiment Analyzer</h2>
+    <p>Analyze sentiment for specific aspects in a sentence</p>
+
+    <form method="POST">
+        <textarea name="sentence" placeholder="Enter sentence..." required></textarea><br>
+        <input type="text" name="aspects" placeholder="Enter aspects (comma separated)" required><br>
+        <button type="submit">Analyze</button>
+    </form>
+
+    {% if overall %}
+    <div class="result">
+        <h3>Overall Sentiment: {{ overall }}</h3>
+    </div>
+    {% endif %}
+
+    {% if result %}
+    <div class="result">
+        <h3>Aspect-wise Results:</h3>
+        <ul>
+            {% for r in result %}
+            <li><b>{{ r.aspect }}</b> → {{ r.sentiment }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
